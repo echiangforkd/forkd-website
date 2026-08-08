@@ -1,1 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Confirming your email — forkd</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0d0d0f; --surface: #17171a; --surface2: #1f1f24;
+      --accent: #ff5c35; --teal: #2de0b0;
+      --text: #f0eff5; --muted: #7b7a88; --border: #2a2a32;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .card {
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+    }
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 36px;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 32px;
+    }
+    .logo .d { color: var(--accent); }
+    .icon {
+      width: 64px;
+      height: 64px;
+      background: var(--surface2);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 32px;
+    }
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+    .btn {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 16px 40px;
+      border-radius: 13px;
+      text-decoration: none;
+      box-shadow: 0 6px 22px rgba(255, 92, 53, 0.34);
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
+      cursor: pointer;
+    }
+    .btn:hover {
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(255, 92, 53, 0.44);
+    }
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 28px 0;
+    }
+    .hint {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .hint strong { color: var(--text); }
+    .error-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      font-size: 14px;
+      color: var(--accent);
+      line-height: 1.5;
+      margin-bottom: 20px;
+      display: none;
+    }
+    #openBtn { display: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">fork<span class="d">d</span></div>
+
+    <div class="icon">✉️</div>
+    <h1>Confirming your email</h1>
+    <p class="subtitle">Just a moment — opening forkd to complete verification.</p>
+
+    <div id="errorBox" class="error-box"></div>
+    <a id="openBtn" class="btn" href="#">Open forkd</a>
+
+    <hr class="divider" />
+
+    <p class="hint" id="hint">
+      <strong>App didn't open automatically?</strong><br />
+      Tap the button above to open forkd.<br /><br />
+      <strong>Inside Outlook, Gmail, or another mail app?</strong><br />
+      Mail apps sometimes block app deep-links. Open this email in your phone's
+      default browser (Safari on iPhone, Chrome on Android), then tap the
+      confirmation link again.
+    </p>
+  </div>
+
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var tokenHash = params.get('token_hash');
+      var type = params.get('type');
+
+      if (!tokenHash || !type) {
+        var errorBox = document.getElementById('errorBox');
+        errorBox.textContent =
+          'Missing confirmation parameters. Please request a new confirmation email.';
+        errorBox.style.display = 'block';
+        document.getElementById('hint').style.display = 'none';
+        return;
+      }
+
+      var deepLink =
+        'forkd://auth/confirm' +
+        '?token_hash=' + encodeURIComponent(tokenHash) +
+        '&type=' + encodeURIComponent(type);
+
+      var btn = document.getElementById('openBtn');
+      btn.href = deepLink;
+      btn.style.display = 'inline-block';
+
+      // Auto-redirect attempt. Works in Safari and most Android browsers.
+      // WKWebView (Outlook/Gmail in-app browser) blocks custom-scheme navigation
+      // via window.location — that's expected. The button above handles that case
+      // when the user opens in their default browser.
+      setTimeout(function () {
+        window.location.href = deepLink;
+      }, 400); // brief delay so the page renders visibly before redirecting
+    })();
+  </script>
+</body>
+</html>
 
